@@ -6,6 +6,9 @@
 </head>
 <body>
   <h1>Notcoin Market</h1>
+  <div id="profile"></div>
+  <div id="cart"></div>
+  <div id="history"></div>
   <div id="market"></div>
   <script>
     // Telegram WebApp API
@@ -18,7 +21,54 @@
     // Укажи здесь свой реальный адрес API-сервера!
     const API_URL = 'https://bright-lizards-check.loca.lt';
 
-    // Получаем список карт с сервера
+    // --- Профиль пользователя ---
+    if (user_id) {
+      fetch(`${API_URL}/profile?user_id=${user_id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.balance !== undefined) {
+            document.getElementById('profile').innerText =
+              `Профиль: Баланс: ${data.balance} NOT, Уровень: ${data.trading_level}, Опыт: ${data.experience}`;
+          } else {
+            document.getElementById('profile').innerText = "Профиль не найден!";
+          }
+        })
+        .catch(() => {
+          document.getElementById('profile').innerText = "Ошибка загрузки профиля!";
+        });
+
+      // --- Корзина пользователя ---
+      fetch(`${API_URL}/cart?user_id=${user_id}`)
+        .then(res => res.json())
+        .then(items => {
+          if (items.length > 0) {
+            document.getElementById('cart').innerText =
+              "Корзина: " + items.map(i => `${i[1]} (${i[2]} NOT)`).join(', ');
+          } else {
+            document.getElementById('cart').innerText = "Корзина пуста";
+          }
+        })
+        .catch(() => {
+          document.getElementById('cart').innerText = "Ошибка загрузки корзины!";
+        });
+
+      // --- История пользователя ---
+      fetch(`${API_URL}/history?user_id=${user_id}`)
+        .then(res => res.json())
+        .then(items => {
+          if (items.length > 0) {
+            document.getElementById('history').innerText =
+              "История: " + items.map(i => `${i[0]}: ${i[1]} (${i[2]})`).join('; ');
+          } else {
+            document.getElementById('history').innerText = "История пуста";
+          }
+        })
+        .catch(() => {
+          document.getElementById('history').innerText = "Ошибка загрузки истории!";
+        });
+    }
+
+    // --- Маркет ---
     fetch(`${API_URL}/market`)
       .then(res => res.json())
       .then(cards => {
