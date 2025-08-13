@@ -15,8 +15,11 @@
     // Получаем user_id из Telegram WebAppData
     const user_id = tg.initDataUnsafe.user ? tg.initDataUnsafe.user.id : null;
 
-    // Получаем список карт с твоего сервера
-    fetch('https://your-server.com/market')
+    // Укажи здесь свой реальный адрес API-сервера!
+    const API_URL = 'https://thin-kiwis-fall.loca.lt'; // <-- твой адрес LocalTunnel
+
+    // Получаем список карт с сервера
+    fetch(`${API_URL}/market`)
       .then(res => res.json())
       .then(cards => {
         const marketDiv = document.getElementById('market');
@@ -24,7 +27,7 @@
           const btn = document.createElement('button');
           btn.innerText = `Купить ${card[1]} за ${card[3]} NOT`;
           btn.onclick = () => {
-            fetch('https://your-server.com/buy', {
+            fetch(`${API_URL}/buy`, {
               method: 'POST',
               headers: {'Content-Type': 'application/json'},
               body: JSON.stringify({user_id, card_id: card[0]})
@@ -35,6 +38,10 @@
           marketDiv.appendChild(btn);
           marketDiv.appendChild(document.createElement('br'));
         });
+      })
+      .catch(err => {
+        document.getElementById('market').innerText = "Ошибка загрузки данных с сервера!";
+        console.error(err);
       });
   </script>
 </body>
